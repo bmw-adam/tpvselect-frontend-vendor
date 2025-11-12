@@ -1,4 +1,4 @@
-use crate::hash::ShortHash;
+use crate::util::ShortHash;
 use proc_macro2::{Ident, Span};
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
@@ -91,7 +91,7 @@ impl Interner {
         id: &str,
         span: Span,
         linked_module: bool,
-    ) -> Result<ImportModule<'_>, Diagnostic> {
+    ) -> Result<ImportModule, Diagnostic> {
         let mut files = self.files.borrow_mut();
         if let Some(file) = files.get(id) {
             return Ok(ImportModule::Named(self.intern_str(&file.new_identifier)));
@@ -308,7 +308,7 @@ fn shared_module<'a>(
             intern.resolve_import_module(m, *span, linked_module)?
         }
         ast::ImportModule::RawNamed(m, _span) => ImportModule::RawNamed(intern.intern_str(m)),
-        ast::ImportModule::Inline(idx) => ImportModule::Inline(*idx as u32),
+        ast::ImportModule::Inline(idx, _) => ImportModule::Inline(*idx as u32),
     })
 }
 
